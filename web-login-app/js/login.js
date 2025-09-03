@@ -1,12 +1,3 @@
-// NOTA DE SEGURIDAD: Este método de autenticación no es seguro y solo debe usarse para prototipos.
-// En una aplicación real, la validación debe hacerse en un servidor.
-const users = [
-    { username: 'admin1', password: 'admin123', role: 'admin' },
-    { username: 'profesor1', password: 'prof123', role: 'teacher' },
-    { username: 'padre1', password: 'padre123', role: 'parent' },
-    { username: 'alumno1', password: 'alumno123', role: 'student' }
-];
-
 function mostrarMensaje(msg) {
     let mensaje = document.getElementById('loginMessage');
     if (!mensaje) {
@@ -17,19 +8,31 @@ function mostrarMensaje(msg) {
     mensaje.textContent = msg;
 }
 
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
 
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
 
-    const user = users.find(u => u.username === username && u.password === password);
+    try {
+        // NOTA DE SEGURIDAD: En una app real, la validación debe hacerse en un servidor (backend).
+        // Esto es solo una simulación para separar los datos.
+        const response = await fetch('../config/users.json');
+        const users = await response.json();
 
-    if (user) {
-        // Redirección dinámica basada en el rol.
-        window.location.href = `dashboards/${user.role}.html`;
-    } else {
-        mostrarMensaje('Usuario o contraseña incorrectos');
+        const user = users.find(u => u.username === username && u.password === password);
+
+        if (user) {
+            // Guardar información del usuario para usar en los dashboards (opcional)
+            sessionStorage.setItem('loggedInUser', JSON.stringify(user));
+            // Redirección dinámica basada en el rol.
+            window.location.href = `dashboards/${user.role}.html`;
+        } else {
+            mostrarMensaje('Usuario o contraseña incorrectos');
+        }
+    } catch (error) {
+        console.error('Error al cargar los datos de usuario:', error);
+        mostrarMensaje('Error en el sistema. Intente más tarde.');
     }
 }
 

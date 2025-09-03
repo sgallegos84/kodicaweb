@@ -14,56 +14,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Selectores de elementos del DOM
     const navbarLinks = document.getElementById('navbarLinks');
-    const tablaTareasBody = document.querySelector("#tablaTareas tbody");
+    const taskCardsContainer = document.getElementById('task-cards-container');
     const modal = document.getElementById('modalTarea');
+
+    // --- Contenedores de secciones ---
+    const dashboardPrincipal = document.getElementById('dashboardPrincipal');
+    const resumenIA = document.getElementById('resumenIA');
+    const guiaEstudioIA = document.getElementById('guiaEstudioIA');
+
+
+    // --- Iconos y colores por materia ---
+    const materiaInfo = {
+        'Matemáticas': { icon: 'fa-calculator', color: '#ff6b6b' },
+        'Español': { icon: 'fa-book', color: '#4d96ff' },
+        'Ciencias': { icon: 'fa-flask', color: '#2ecc71' },
+        'Inglés': { icon: 'fa-language', color: '#9b59b6' },
+        'Historia': { icon: 'fa-landmark', color: '#f39c12' },
+        'Arte': { icon: 'fa-palette', color: '#e74c3c' },
+        'Educación Física': { icon: 'fa-futbol', color: '#1abc9c' },
+        'default': { icon: 'fa-file-alt', color: '#7f8c8d' }
+    };
 
     // --- Funciones de renderizado y UI ---
 
     const mostrarTareas = (filtradas) => {
-        tablaTareasBody.innerHTML = "";
+        taskCardsContainer.innerHTML = "";
         if (filtradas.length === 0) {
-            tablaTareasBody.innerHTML = `<tr><td colspan="7" data-label="Resultado">No hay tareas que coincidan con los filtros.</td></tr>`;
+            taskCardsContainer.innerHTML = `<p class="no-tasks">¡Genial! No tienes tareas pendientes.</p>`;
             return;
         }
         filtradas.forEach(tarea => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td data-label="Tarea"><a href="#" data-task-id="${tarea.id}">${tarea.nombre}</a></td>
-                <td data-label="Materia">${tarea.materia}</td>
-                <td data-label="Fecha de creación">${tarea.fechaCreacion}</td>
-                <td data-label="Fecha de entrega">${tarea.fechaEntrega || 'N/A'}</td>
-                <td data-label="Completado">${tarea.completado ? "Completado" : "Pendiente"}</td>
-                <td data-label="Revisado por padre">${tarea.revisado ? "Revisado" : "No revisado"}</td>
-                <td data-label="Tipo">${tarea.tipo === "apunte" ? "Apunte" : "Tarea"}</td>
+            const info = materiaInfo[tarea.materia] || materiaInfo.default;
+            const card = document.createElement('div');
+            card.className = `task-card ${tarea.completado ? 'completado' : ''}`;
+            card.style.borderColor = info.color;
+            card.dataset.taskId = tarea.id;
+
+            card.innerHTML = `
+                <div class="task-card-header">
+                    <i class="fas ${info.icon} task-icon" style="color: ${info.color};"></i>
+                    <h3 class="task-title">${tarea.nombre}</h3>
+                </div>
+                <div class="task-details">
+                    <p><i class="fas fa-tag"></i> ${tarea.materia}</p>
+                    <p><i class="fas fa-calendar-alt"></i> Entrega: ${tarea.fechaEntrega || 'N/A'}</p>
+                </div>
             `;
-            tablaTareasBody.appendChild(tr);
+            card.addEventListener('click', () => abrirModal(tarea.id));
+            taskCardsContainer.appendChild(card);
         });
+        actualizarBarraProgreso();
     };
 
     const filtrarTareas = () => {
-        const fecha = document.getElementById("filtroFecha").value;
-        const materia = document.getElementById("filtroMateria").value;
-        const completado = document.getElementById("filtroCompletado").value;
-        const revisado = document.getElementById("filtroRevisado").value;
+        // La lógica de filtros se puede re-implementar con un modal o una sección dedicada
+        // Por ahora, mostramos las no completadas por defecto.
+        mostrarTareas(tareas.filter(t => !t.completado));
+    };
 
-        let filtradas = tareas;
-
-        if (!fecha && !materia && !completado && !revisado) {
-            filtradas = tareas.filter(t => !t.completado);
-        } else {
-            if (fecha) filtradas = filtradas.filter(t => t.fechaEntrega === fecha);
-            if (materia) filtradas = filtradas.filter(t => t.materia === materia);
-            if (completado) filtradas = filtradas.filter(t => (completado === "completado") === t.completado);
-            if (revisado) filtradas = filtradas.filter(t => (revisado === "revisado") === t.revisado);
-        }
-        mostrarTareas(filtradas);
+    const actualizarBarraProgreso = () => {
+        const totalTareas = tareas.filter(t => t.tipo === 'tarea').length;
+        const tareasCompletadas = tareas.filter(t => t.tipo === 'tarea' && t.completado).length;
+        const porcentaje = totalTareas > 0 ? (tareasCompletadas / totalTareas) * 100 : 0;
+        document.getElementById('tasks-progress').style.width = `${porcentaje}%`;
     };
 
     const resetFiltros = () => {
-        document.getElementById("filtroFecha").value = "";
-        document.getElementById("filtroMateria").value = "";
-        document.getElementById("filtroCompletado").value = "";
-        document.getElementById("filtroRevisado").value = "";
+        let filtradas = tareas;
         mostrarTareas(tareas.filter(t => !t.completado));
     };
 
@@ -77,24 +94,24 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const mostrarDashboard = () => {
-        document.getElementById("dashboardPrincipal").style.display = "block";
-        document.getElementById("resumenIA").style.display = "none";
-        document.getElementById("guiaEstudioIA").style.display = "none";
+        dashboardPrincipal.classList.remove('hidden');
+        resumenIA.classList.add('hidden');
+        guiaEstudioIA.classList.add('hidden');
         closeMenu();
     };
 
     const mostrarResumen = () => {
-        document.getElementById("dashboardPrincipal").style.display = "none";
-        document.getElementById("resumenIA").style.display = "block";
-        document.getElementById("guiaEstudioIA").style.display = "none";
-        // mostrarResumenMateria(); // Asumiendo que esta función existe y es relevante
+        dashboardPrincipal.classList.add('hidden');
+        resumenIA.classList.remove('hidden');
+        guiaEstudioIA.classList.add('hidden');
+        mostrarResumenMateria();
         closeMenu();
     };
 
     const mostrarGuiaEstudio = () => {
-        document.getElementById("dashboardPrincipal").style.display = "none";
-        document.getElementById("resumenIA").style.display = "none";
-        document.getElementById("guiaEstudioIA").style.display = "block";
+        dashboardPrincipal.classList.add('hidden');
+        resumenIA.classList.add('hidden');
+        guiaEstudioIA.classList.remove('hidden');
         closeMenu();
     };
 
@@ -109,10 +126,10 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("inputFotos").value = "";
         document.getElementById("previewFotos").innerHTML = "";
         document.getElementById("iaTexto").textContent = "";
-        modal.style.display = "flex";
+        modal.classList.remove('hidden');
     };
 
-    const cerrarModal = () => modal.style.display = "none";
+    const cerrarModal = () => modal.classList.add('hidden');
 
     const confirmarEnvio = () => {
         if (tareaSeleccionadaId !== null) {
@@ -131,15 +148,62 @@ document.addEventListener('DOMContentLoaded', function() {
         const formTarea = document.getElementById("formTareaContainer");
         const formApunte = document.getElementById("formApunteContainer");
         if (tipo === "tarea") {
-            const isHidden = formTarea.style.display === "none" || formTarea.style.display === "";
-            formTarea.style.display = isHidden ? "block" : "none";
-            formApunte.style.display = "none";
+            formTarea.classList.toggle('hidden');
+            formApunte.classList.add('hidden');
         } else {
-            const isHidden = formApunte.style.display === "none" || formApunte.style.display === "";
-            formApunte.style.display = isHidden ? "block" : "none";
-            formTarea.style.display = "none";
+            formApunte.classList.toggle('hidden');
+            formTarea.classList.add('hidden');
         }
     };
+
+    const crearTarea = (e) => {
+        e.preventDefault();
+        const materia = document.getElementById("tareaMateria").value;
+        const nombre = document.getElementById("tareaNombre").value;
+        const fecha = document.getElementById("tareaFecha").value;
+        if (!materia || !nombre || !fecha) return;
+        const hoy = new Date().toISOString().slice(0,10);
+        const nuevaTarea = {
+            id: tareas.length + 1,
+            nombre,
+            materia,
+            fechaCreacion: hoy,
+            fechaEntrega: fecha,
+            completado: false,
+            revisado: false,
+            tipo: "tarea"
+        };
+        tareas.push(nuevaTarea);
+        resetFiltros();
+        alert("¡Tarea creada!");
+        document.getElementById("formTarea").reset();
+        toggleForm('tarea');
+    };
+
+    const crearApunte = (e) => {
+        e.preventDefault();
+        const materia = document.getElementById("apunteMateria").value;
+        const archivo = document.getElementById("apunteArchivo").files[0];
+        if (!materia || !archivo) return;
+        const hoy = new Date().toISOString().slice(0,10);
+        const nuevoApunte = {
+            id: tareas.length + 1,
+            nombre: `Apunte de ${materia} - ${archivo.name}`,
+            materia,
+            fechaCreacion: hoy,
+            fechaEntrega: null,
+            completado: true,
+            revisado: false,
+            tipo: "apunte",
+            contenido: `Contenido simulado del archivo ${archivo.name}`
+        };
+        tareas.push(nuevoApunte);
+        resetFiltros();
+        alert("¡Apunte subido!");
+        document.getElementById("formApunte").reset();
+        toggleForm('apunte');
+    };
+
 
     // --- Lógica de Exportación y Cuestionario ---
 
@@ -222,6 +286,54 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('btn-calificar').addEventListener('click', calificarCuestionario);
     };
 
+    const previsualizarFotos = () => {
+        const input = document.getElementById("inputFotos");
+        const preview = document.getElementById("previewFotos");
+        const iaTexto = document.getElementById("iaTexto");
+        preview.innerHTML = "";
+        iaTexto.textContent = "";
+        if (input.files.length > 0) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.style.maxWidth = "100px";
+                    img.style.margin = "5px";
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+                // Simulación IA: mostrar nombre del archivo como texto extraído
+                iaTexto.textContent += `Texto extraído de ${file.name}: [Simulación IA]\n`;
+            });
+        }
+    }
+
+    function mostrarResumenMateria() {
+        const materia = document.getElementById("materiaResumen").value;
+        const apuntes = tareas.filter(t => t.tipo === "apunte" && (materia === "" || t.materia === materia));
+        const contenedor = document.getElementById("contenedorResumen");
+        if (apuntes.length === 0) {
+            contenedor.innerHTML = "<p>No hay apuntes para esta materia.</p>";
+            return;
+        }
+        let html = "";
+        apuntes.forEach((apunte) => {
+            html += `
+                <div style="border:1px solid #6dd5ed;border-radius:8px;padding:15px;margin-bottom:15px;">
+                    <strong>${apunte.nombre}</strong> <br>
+                    <span>Materia: ${apunte.materia}</span> <br>
+                    <span>Fecha: ${apunte.fechaCreacion}</span> <br>
+                    <span>Resumen IA:</span>
+                    <div style="background:#e0f7fa;padding:10px;border-radius:6px;margin-top:5px;">
+                        Este es un resumen simulado del apunte "${apunte.nombre}" de la materia ${apunte.materia}.
+                    </div>
+                </div>
+            `;
+        });
+        contenedor.innerHTML = html;
+    }
+
     // --- Lógica de IA ---
 
     const generarGuiaEstudio = () => {
@@ -229,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const resultadoGuia = document.getElementById('resultadoGuia');
         const contenidoGuia = document.getElementById('contenidoGuia');
         const cuestionarioContainer = document.getElementById('cuestionarioContainer');
-
         if (apuntes.length === 0) {
             contenidoGuia.innerHTML = "<p>No se encontraron apuntes para generar la guía. ¡Sube algunos primero!</p>";
         } else {
@@ -239,11 +350,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             guiaHTML += "</ul><p><strong>Recomendación de estudio:</strong> Repasa los conceptos de ecuaciones y los eventos principales de la Revolución Francesa, ya que parecen ser los temas más recientes.</p>";
             contenidoGuia.innerHTML = guiaHTML;
-            cuestionarioContainer.style.display = 'block';
-            document.getElementById('btn-exportar-pdf').style.display = 'block';
+            cuestionarioContainer.classList.remove('hidden');
+            document.getElementById('btn-exportar-pdf').classList.remove('hidden');
         }
 
-        resultadoGuia.style.display = 'block';
+        resultadoGuia.classList.remove('hidden');
     };
 
     // --- Event Listeners ---
@@ -254,18 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('nav-resumen').addEventListener('click', mostrarResumen);
     document.getElementById('nav-guia-ia').addEventListener('click', mostrarGuiaEstudio);
 
-    // Filtros
-    document.getElementById('btn-filtrar').addEventListener('click', filtrarTareas);
-    document.getElementById('btn-limpiar-filtros').addEventListener('click', resetFiltros);
-
-    // Modal
-    tablaTareasBody.addEventListener('click', (e) => {
-        if (e.target.tagName === 'A' && e.target.dataset.taskId) {
-            e.preventDefault();
-            const taskId = parseInt(e.target.dataset.taskId, 10);
-            abrirModal(taskId);
-        }
-    });
     document.getElementById('btn-cerrar-modal').addEventListener('click', cerrarModal);
     document.getElementById('btn-confirmar-envio').addEventListener('click', confirmarEnvio);
 
@@ -274,6 +373,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btn-toggle-apunte').addEventListener('click', () => toggleForm('apunte'));
     document.getElementById('btn-cancelar-tarea').addEventListener('click', () => toggleForm('tarea'));
     document.getElementById('btn-cancelar-apunte').addEventListener('click', () => toggleForm('apunte'));
+    document.getElementById('formTarea').addEventListener('submit', crearTarea);
+    document.getElementById('formApunte').addEventListener('submit', crearApunte);
+    document.getElementById('inputFotos').addEventListener('change', previsualizarFotos);
+    document.getElementById('materiaResumen').addEventListener('change', mostrarResumenMateria);
 
     // IA
     document.getElementById('btn-generar-guia').addEventListener('click', generarGuiaEstudio);
