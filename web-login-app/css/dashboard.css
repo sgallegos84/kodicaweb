@@ -1,0 +1,124 @@
+body {
+    /* Reseteamos los estilos del body que venían del login */
+    display: block; /* Cambiamos de flex a block para un flujo normal */
+    background: #f0f2f5; /* Un fondo más neutro para los dashboards */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: auto;
+    justify-content: normal;
+    align-items: normal;
+}
+
+/* Estilos para el contenedor principal del dashboard del estudiante */
+.dashboard-container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(33,147,176,0.2);
+    padding: 40px 30px;
+    width: 80vw;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+h2 {
+    color: #2193b0;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%; /* Hacemos que la tabla ocupe el 100% de su contenedor */
+    margin: 0 auto 30px auto;
+    border-collapse: collapse;
+    font-size: 1em;
+}
+
+th, td {
+    border: 1px solid #6dd5ed;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #6dd5ed;
+    color: #fff;
+}
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.filtros label {
+    color: #2193b0;
+    font-weight: 500;
+}
+
+.filtros select, .filtros input[type="date"], .filtros button {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #6dd5ed;
+}
+
+/* --- Estilos Responsivos --- */
+@media (max-width: 900px) {
+    .dashboard-container {
+        width: 95vw;
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-container {
+        padding: 20px 10px;
+        width: 95vw;
+        margin: 20px auto;
+    }
+    table, th, td {
+        font-size: 0.9em;
+        padding: 6px;
+    }
+    .filtros {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .dashboard-container {
+        padding: 15px 5px;
+    }
+    table thead {
+        display: none;
+    }
+    table, tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+    tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #6dd5ed;
+        padding-bottom: 10px;
+    }
+    td {
+        text-align: right; /* Alineamos el contenido a la derecha */
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid #eee;
+    }
+    td:before {
+        content: attr(data-label); /* Usamos el atributo data-label para el título */
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #2193b0;
+        text-align: left;
+    }
+}

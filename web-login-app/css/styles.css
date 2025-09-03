@@ -1,0 +1,138 @@
+body {
+    background: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(33,147,176,0.2);
+    padding: 40px 30px;
+    width: 350px;
+    text-align: center;
+}
+
+h1 {
+    color: #2193b0;
+    margin-bottom: 10px;
+    font-size: 2.2em;
+}
+
+.subtitle {
+    color: #6dd5ed;
+    margin-bottom: 25px;
+    font-size: 1.1em;
+}
+
+form label {
+    display: block;
+    text-align: left;
+    margin: 15px 0 5px 0;
+    color: #2193b0;
+    font-weight: 600;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #6dd5ed;
+    margin-bottom: 10px;
+    font-size: 1em;
+    transition: border 0.2s;
+}
+
+form input:focus {
+    border: 2px solid #2193b0;
+    outline: none;
+}
+
+button[type="submit"] {
+    background: linear-gradient(90deg, #2193b0 0%, #6dd5ed 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 0;
+    width: 100%;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(33,147,176,0.15);
+    transition: background 0.2s;
+}
+
+button[type="submit"]:hover {
+    background: linear-gradient(90deg, #6dd5ed 0%, #2193b0 100%);
+}
+
+#loginMessage {
+    margin-top: 15px;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.navbar {
+    width: 100%;
+    background: #2193b0;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.navbar-brand {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-left: 20px;
+}
+.navbar-links {
+    display: flex;
+    gap: 30px;
+    margin-right: 20px;
+}
+.navbar-links a {
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.navbar-links a:hover {
+    color: #6dd5ed;
+}
+.navbar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2em;
+    margin-right: 20px;
+    cursor: pointer;
+}
+@media (max-width: 700px) {
+    .navbar-links {
+        display: none;
+        flex-direction: column;
+        background: #2193b0;
+        position: absolute;
+        top: 50px;
+        right: 0;
+        width: 100%;
+        padding: 10px 0;
+        z-index: 101;
+    }
+    .navbar-links.show {
+        display: flex;
+    }
+    .navbar-toggle {
+        display: block;
+    }
+}

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Alumno</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Alumno</div>
+        <button class="navbar-toggle">&#9776;</button>
+        <div class="navbar-links" id="navbarLinks">
+            <a href="#" id="nav-inicio">Inicio</a>
+            <a href="#" id="nav-resumen">Resumen IA de Apuntes</a>
+            <a href="#" id="nav-guia-ia">Guía de Estudio IA</a>
+            <a href="../index.html">Cerrar Sesión</a>
+        </div>
+    </nav>
+    <div id="dashboardPrincipal">
+        <div class="dashboard-container">
+            <h2>Horario de Clases</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Lunes</th>
+                        <th>Martes</th>
+                        <th>Miércoles</th>
+                        <th>Jueves</th>
+                        <th>Viernes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-label="Hora">8:00 - 9:00</td>
+                        <td data-label="Lunes">Matemáticas</td>
+                        <td data-label="Martes">Español</td>
+                        <td data-label="Miércoles">Ciencias</td>
+                        <td data-label="Jueves">Historia</td>
+                        <td data-label="Viernes">Educación Física</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Hora">9:00 - 10:00</td>
+                        <td data-label="Lunes">Inglés</td>
+                        <td data-label="Martes">Matemáticas</td>
+                        <td data-label="Miércoles">Español</td>
+                        <td data-label="Jueves">Ciencias</td>
+                        <td data-label="Viernes">Arte</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Hora">10:00 - 10:30</td>
+                        <td data-label="Actividad" colspan="5">Receso</td>
+                    </tr>
+                    <tr>
+                        <td data-label="Hora">10:30 - 11:30</td>
+                        <td data-label="Lunes">Ciencias</td>
+                        <td data-label="Martes">Historia</td>
+                        <td data-label="Miércoles">Educación Física</td>
+                        <td data-label="Jueves">Matemáticas</td>
+                        <td data-label="Viernes">Español</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Tareas Pendientes</h2>
+            <div class="filtros">
+                <label for="filtroFecha">Fecha de entrega:</label>
+                <input type="date" id="filtroFecha">
+                <label for="filtroMateria">Materia:</label>
+                <select id="filtroMateria">
+                    <option value="">Todas</option>
+                    <option value="Matemáticas">Matemáticas</option>
+                    <option value="Español">Español</option>
+                    <option value="Ciencias">Ciencias</option>
+                    <option value="Inglés">Inglés</option>
+                    <option value="Historia">Historia</option>
+                    <option value="Educación Física">Educación Física</option>
+                    <option value="Arte">Arte</option>
+                </select>
+                <label for="filtroCompletado">Completado:</label>
+                <select id="filtroCompletado">
+                    <option value="">Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="completado">Completado</option>
+                </select>
+                <label for="filtroRevisado">Revisado por padre:</label>
+                <select id="filtroRevisado">
+                    <option value="">Todos</option>
+                    <option value="revisado">Revisado</option>
+                    <option value="no-revisado">No revisado</option>
+                </select>
+                <button id="btn-filtrar">Filtrar</button>
+                <button id="btn-limpiar-filtros">Limpiar</button>
+            </div>
+            <table id="tablaTareas">
+                <thead>
+                    <tr>
+                        <th>Tarea</th>
+                        <th>Materia</th>
+                        <th>Fecha de creación</th>
+                        <th>Fecha de entrega</th>
+                        <th>Completado</th>
+                        <th>Revisado por padre</th>
+                        <th>Tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las tareas se llenan por JS -->
+                </tbody>
+            </table>
+
+            <!-- Modal para subir fotos -->
+            <div id="modalTarea" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+                <div style="background:#fff; padding:20px; border-radius:12px; max-width:400px; margin:auto; position:relative;">
+                    <span id="btn-cerrar-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5em;">&times;</span>
+                    <h3 id="modalTitulo"></h3>
+                    <input type="file" id="inputFotos" multiple accept="image/*" onchange="previsualizarFotos()"><br><br>
+                    <div id="previewFotos"></div>
+                    <div id="iaTexto" style="margin:10px 0; color:#2193b0;"></div>
+                    <button id="btn-confirmar-envio">Confirmar y Guardar</button>
+                </div>
+            </div>
+
+            <!-- Formulario para crear tarea -->
+            <div id="formTareaContainer" style="display:none; margin-top:20px;">
+                <h2>Crear Tarea</h2>
+                <form id="formTarea" onsubmit="crearTarea(event)">
+                    <label for="tareaNombre">Nombre de la tarea:</label>
+                    <input type="text" id="tareaNombre" required>
+                    <label for="tareaMateria">Materia:</label>
+                    <select id="tareaMateria" required>
+                        <option value="">Seleccione</option>
+                        <option value="Matemáticas">Matemáticas</option>
+                        <option value="Español">Español</option>
+                        <option value="Ciencias">Ciencias</option>
+                        <option value="Inglés">Inglés</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Educación Física">Educación Física</option>
+                        <option value="Arte">Arte</option>
+                    </select>
+                    <label for="tareaFecha">Fecha de entrega:</label>
+                    <input type="date" id="tareaFecha" required>
+                    <button type="submit">Crear Tarea</button>
+                    <button type="button" id="btn-cancelar-tarea">Cancelar</button>
+                </form>
+            </div>
+
+            <!-- Formulario para crear apunte -->
+            <div id="formApunteContainer" style="display:none; margin-top:20px;">
+                <h2>Subir Apunte</h2>
+                <form id="formApunte" onsubmit="crearApunte(event)">
+                    <label for="apunteMateria">Materia:</label>
+                    <select id="apunteMateria" required>
+                        <option value="">Seleccione</option>
+                        <option value="Matemáticas">Matemáticas</option>
+                        <option value="Español">Español</option>
+                        <option value="Ciencias">Ciencias</option>
+                        <option value="Inglés">Inglés</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Educación Física">Educación Física</option>
+                        <option value="Arte">Arte</option>
+                    </select>
+                    <label for="apunteArchivo">Archivo (PDF, DOCX):</label>
+                    <input type="file" id="apunteArchivo" accept="image/*,.pdf,.docx" capture="environment" required>
+                    <button type="submit">Subir Apunte</button>
+                    <button type="button" id="btn-cancelar-apunte">Cancelar</button>
+                </form>
+            </div>
+
+            <button id="btn-toggle-tarea" style="margin-top:20px;">+ Crear Tarea</button>
+            <button id="btn-toggle-apunte" style="margin-top:10px;">+ Subir Apunte</button>
+        </div>
+    </div>
+    <div id="resumenIA" style="display:none;max-width:900px;margin:30px auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(33,147,176,0.15);padding:30px;">
+        <h2 style="color:#2193b0;">Resumen IA de Apuntes por Materia</h2>
+        <label for="materiaResumen">Selecciona materia:</label>
+        <select id="materiaResumen" onchange="mostrarResumenMateria()">
+            <option value="">Todas</option>
+            <option value="Matemáticas">Matemáticas</option>
+            <option value="Español">Español</option>
+            <option value="Ciencias">Ciencias</option>
+            <option value="Inglés">Inglés</option>
+            <option value="Historia">Historia</option>
+            <option value="Educación Física">Educación Física</option>
+            <option value="Arte">Arte</option>
+        </select>
+        <div id="contenedorResumen" style="margin-top:20px;"></div>
+    </div>
+    <div id="guiaEstudioIA" style="display:none;max-width:900px;margin:30px auto;background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(33,147,176,0.15);padding:30px;">
+        <h2 style="color:#2193b0;">Generador de Guía de Estudio con IA</h2>
+        <p>La IA analizará todos tus apuntes para generar una guía de estudio personalizada, un cuestionario de práctica y un PDF descargable.</p>
+        <div class="actions-container" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button id="btn-generar-guia">Generar Guía de Estudio</button>
+            <button id="btn-exportar-pdf" style="display: none;">Exportar a PDF</button>
+        </div>
+        <div id="resultadoGuia" style="margin-top:20px; background:#e0f7fa; padding:15px; border-radius:8px; display:none;">
+            <h3>Tu Guía de Estudio Personalizada:</h3>
+            <div id="contenidoGuia"></div>
+            
+            <div id="cuestionarioContainer" style="margin-top: 20px; display: none;">
+                <hr style="border: 1px solid #6dd5ed; margin: 20px 0;">
+                <h3>Cuestionario de Práctica</h3>
+                <p>Pon a prueba tus conocimientos con estas preguntas generadas por la IA.</p>
+                <button id="btn-iniciar-cuestionario">Iniciar Cuestionario</button>
+                <div id="cuestionarioForm" style="margin-top: 15px;"></div>
+                <div id="cuestionarioResultado" style="margin-top: 15px; font-weight: bold;"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="../js/student-dashboard.js"></script>
+</body>
+</html>
